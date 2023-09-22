@@ -1,11 +1,9 @@
 #utilizacion para parsear webs a través de la extraccion de html
 import requests
+from menu import *
 from bs4 import BeautifulSoup as soup
 import re
 
-url = "https://www.nytimes.com/section/technology"
-#mi_url = "https://www.nytimes.com/section/technology"
-#url='https://www.elmundo.es/internacional.html'
 #para coger el string del contenido en HTML conteninedo todos los hiperliks del articulo
 def get_contenido(url):
 
@@ -16,17 +14,7 @@ def get_contenido(url):
     #print(pagina_soup)
 
     paquete_url=pagina_soup.find_all("script", {"type" : "application/ld+json"})
-    #print(paquete_url)
-    """
-    etiquetas=[]
-    for script_element in paquete_url:
-        script_type = script_element.get("type")
-        #print("Elementos de tipo x: " + str(script_type) +str(script_element))
-        for dictionary in script_type:
-            etiquetas.append(dictionary)
-            print(etiquetas)
-    """
-
+    
     #inicializando lista que contendra los tags
 #mes.com/2023/09/19/technology/instacart-ipo-stock-shares.html
     #EXTRAYENDO TODOS HYPERLINKS
@@ -36,7 +24,7 @@ def get_contenido(url):
             etiquetas.append(dictionary)
     longitud=len(etiquetas)
     #print(f'Strings presentes en la lista:  {longitud}')
-    #print('**********************')
+    print('**********************')
 
     #CREANDO EL STRING DEL CONTENIDO EN 1
     #quitar espacios
@@ -58,7 +46,7 @@ def get_contenido(url):
 
   
 #inicio y final de los indices de los hiperlinks de los articulos
-def parseo_contenido(contenido_interes):
+def parseo_contenido(contenido_interes,url):
     #implementar patrones
     primeros_indices=[]
     final_indices=[]
@@ -79,10 +67,10 @@ def parseo_contenido(contenido_interes):
     #print(primeros_indices)
     #print(final_indices)
     print('Indices extraidos correctamente')
-    return primeros_indices,final_indices
+    return primeros_indices,final_indices,url
 
 #obteniendo los enlaces de las ultimas noticias publicadas en 2023  
-def get_urls(primeros_indices, final_indices,contenido_interes):
+def get_urls(primeros_indices, final_indices,contenido_interes,url):
     urls_sucio=[]
     urls=[]
     for i in range(len(primeros_indices)):
@@ -100,8 +88,9 @@ def get_urls(primeros_indices, final_indices,contenido_interes):
 
 # Imprimir la lista de URLs válidas
    
-
+    print(f'Se han encontrado {len(urls_limpias)} en portada')
     print(f'Los enlaces a las noticias de este año son:\n{urls_limpias}')
+    #return urls_limpias,primeros_indices,final_indices,contenido_interes,url
     return urls_limpias
 
     

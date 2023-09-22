@@ -37,8 +37,8 @@ def det_sentimiento(historia):
 
     time.sleep(3)
     print('TEST FINAL')
-    print(f'Nivel de subjetividad: {sentimiento_general(media_subj,"subjetividad" )}({media_subj})')
-    print(f'Nivel polaridad:{sentimiento_general(media_subj,"polaridad")} ({media_polaridad})')
+    print(f'Nivel de subjetividad( de 0 a 1): {sentimiento_general(media_subj,"subjetividad" )}({media_subj})')
+    print(f'Nivel polaridad de (-1 a 1):{sentimiento_general(media_subj,"polaridad")} ({media_polaridad})')
 def medias_ps(lista):
     resultado=sum(lista)/len(lista)    
     #print(resultado)

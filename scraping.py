@@ -1,7 +1,7 @@
 import nltk
 from newspaper import Article
 
-
+#url='https://www.washingtonpost.com/'
 #para almacenar el script principal
 def coger_noticias(url):
     #pasando a la variable el objeto articulo con la url corr
@@ -10,11 +10,14 @@ def coger_noticias(url):
     #setups para aplicar npl
     noticia.download()
     noticia.parse()
+    print('----------')
 
     #tokenizacion de textos amplios, divide el texto en frases individuales
     noticia.download("punkt")
     #llamando funcion  nlp una vez simplificado el texto
     noticia.nlp()
+
+    print(f'Titulo de la noticia: {noticia.title}')
 
     #accediendo a la instancia autor dentro de la clase noticia
     print('Autor:' + str(noticia.authors) + '\n')
