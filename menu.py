@@ -1,7 +1,8 @@
 import time
-from extraccion import *
-from procesamiento import procesar_nyt,procesar_wp,procesar_elMundo
-from washington_post.extraccion_wp import WashingtonPost,ElMundo
+from extracciones.extraccion_nyt import *
+from procesamiento import procesar_nyt,procesar_wp,procesar_elMundo,procesar_elDiario
+from extracciones.extraccion_varias import WashingtonPost,ElMundo
+from npl.noticias_nlp import sp_periodico
 #from extraccion import llamar_extraccion,llamar_resumen
 #from  washington_post.extraccion_wp import WashingtonPost
 #from washington_post import extraccion_wp 
@@ -16,13 +17,13 @@ class Menus:
             print('Bienvenido a NOWATT, una app donde puedes acceder a diferentes periodicos sin necesidad de suscripcion y comparar los contenidos de sus publicaciones.\n Gracias a ella podrás investigar como un mismo tema es tratado desde diferentes persectivas y conseguir así formarte una opinion lo más completa posible sobre los sucesos actuales que son de interes público.')
             nombre=input('Para poder ofrecerte una atención más personalizada, introduce, por favor, tu nombre:')
             print(f'{nombre}, Bienvenido/a a Nowatt. Hora de empezar a analizar noticias\n')
-            time.sleep(2)
+            #time.sleep(2)
             menu_1=f"""{nombre}¿En que periodico deseas entrar?\n Elige uno de los siguientes:
             1- NEW YORK TIMES
             2- WASHINGTON POST
             3- EL MUNDO
             4- EL PAIS
-            5- LIBERTAD DIGITAL
+            5- EL DIARIO
             6- EL CONFIDENCIAL"""
 
             eleccion=input(menu_1)
@@ -31,20 +32,32 @@ class Menus:
                 
                 print('Has elegido el New York Times')
                 url=seccion.nyt_menu(self.nombre)
-                procesado=procesar_nyt(url)
-                return url,procesado
+                procesado,subjetividad_periodico,polaridad_periodico=procesar_nyt(url)
+                sp_periodico(subjetividad_periodico,polaridad_periodico)
+                #return url,procesado
             elif eleccion =='2':
                 print('Has elegido el Washington Post')
                 url=seccion.menu_wp(self.nombre)
                 procesado=procesar_wp(url)
                 print('------')
                 #seccion.nyt_menu(nombre)
-                return url,procesado
+                
                 #return eleccion
             elif eleccion=='3':
                 print('Has elegido el perodico El Mundo')
-                url='https://www.elmundo.es/index.html?utm_source=google&utm_medium=cpc&utm_campaign=unidadeditorial_elmundo_cpc_performance_HMG&utm_content=elmundo__&gad=1&gclid=Cj0KCQjw9rSoBhCiARIsAFOiplkQUuciuxX4E2LstYclP6sGEq_P8hFU4t24M1Djx7rzrYqGKFd_nKoaAtg7EALw_wcB'
+                url=seccion.menu_elMundo(self.nombre)
                 procesado=procesar_elMundo(url)
+                return url,procesado
+            
+            elif eleccion=='4':
+                print('Abriendo El Pais')
+                url=seccion.menu_elPais(self.nombre)
+                procesado=procesar_elMundo(url)
+                return url,procesado
+            elif eleccion =='5':
+                print('Abriendo elDiario.es')
+                url=seccion.menu_elDiario(self.nombre)
+                procesado=procesar_elDiario(url)
                 return url,procesado
             else:
                 print('Esta opcion aun no esta configurada')
@@ -156,6 +169,170 @@ class Seccion:
             
         
             return url
+        
+
+    def menu_elMundo(self,nombre):
+        seccion=f"""{nombre}, has alegido El Mundo. ¿Que seccion quieres ver?
+        1-Portada
+        2-Opinion
+        3-Economia
+        4-Deportes
+        5-Ciencia y Salud
+        6-Internacional
+        7-España"""
+        url=""
+
+        eleccion=input(seccion)
+
+        if eleccion=='1':
+            print('Procesando seccion Portada')
+            url=self.url='https://e00-elmundo.uecdn.es/rss/portada.xml'
+            return url
+        elif eleccion =='2':
+            print('Procesando seccion Opinion')
+            url=self.url='https://e00-elmundo.uecdn.es/rss/opinion.xml'
+        elif eleccion =='3':
+            print('Procesando seccion Economia')
+            url=self.url='https://e00-elmundo.uecdn.es/rss/economia.xml'
+        elif eleccion =='4':
+            print('Procesando seccion Deportes')
+            url=self.url='https://e00-elmundo.uecdn.es/rss/deportes.xml'
+        elif eleccion =='5':
+            print('Procesando seccion Ciencia y salud')
+            url=self.url='https://e00-elmundo.uecdn.es/rss/ciencia-y-salud.xml'
+        elif eleccion =='6':
+            print('Procesando la seccion Internacional')
+            url=self.utl='https://e00-elmundo.uecdn.es/rss/internacional.xml'
+        elif eleccion =='7':
+            print('Has elegido la seccion España')
+            url=self.url='https://e00-elmundo.uecdn.es/rss/espana.xml'
+        return url
+
+    def menu_elPais(self,nombre):
+        menu=f"""{nombre}Has elegido el Pais, escoge la seccion que deseas comparar:
+        1-Portada
+        2-España
+        3-Economia
+        4-Deportes
+        5-Sociedad
+        6-Educacion
+        7-Medio Ambiente
+        8-Ciencia
+        9-Salud
+        10-Tecnologia
+        11-Cultura
+        12-Television
+        13-Gente
+        14-Internacional
+        """
+        seccion=input(menu)
+        url=""
+        if seccion=='1':
+            print('Has elegido la portada')
+            url=self.url='https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada'
+        elif seccion =='2':
+            print('Has elegido la seccion: España')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/espana'
+        elif seccion =='3':
+            print('Has elegido la seccion: Economia')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/economia'
+        elif seccion =='4':
+            print('Has elegido la seccion: Deportes')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/deportes'
+        elif seccion =='5':
+            print('Has elegido la seccion: Sociedad')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/sociedad'
+        elif seccion =='6':
+            print('Has elegido la seccion: Educacion')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/educacion'
+        elif seccion =='7':
+            print('Has elegido la seccion: Medio Ambiente')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/clima-y-medio-ambiente'
+        elif seccion =='8':
+            print('Has elegido la seccion: Ciencia')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/ciencia'
+        elif seccion =='9':
+            print('Has elegido la seccion: Salud')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/salud-y-bienestar'
+        elif seccion =='10':
+            print('Has elegido la seccion: Tecnologia')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/tecnologia'
+        elif seccion =='11':
+            print('Has elegido la seccion: Cultura')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/cultura'
+        elif seccion =='12':
+            print('Has elegido la seccion: Television')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/television'
+        elif seccion =='13':
+            print('Has elegido la seccion: Gente')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/gente'
+        elif seccion =='14':
+            print('Has elegido la seccion: Internacional')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/internacional'
+        
+        return url
+    
+    def menu_elDiario(self,nombre):
+        menu=f"""Elige una de las siguientes secciones dle periodico:
+        1-Portada
+        2-Internacional
+        3-Economia
+        4-Cultura
+        5-Educacion
+        6-Clima
+        7-Desalambre
+        8-Igualdad
+        9-Politica"""
+
+        seccion=input(menu)
+        url=""
+        if seccion=='1':
+            print('Has elegido la portada')
+            url=self.url='https://www.eldiario.es/rss/'
+        elif seccion =='2':
+            print('Has elegido la seccion: España')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/espana'
+        elif seccion =='3':
+            print('Has elegido la seccion: Economia')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/economia'
+        elif seccion =='4':
+            print('Has elegido la seccion: Deportes')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/deportes'
+        elif seccion =='5':
+            print('Has elegido la seccion: Sociedad')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/sociedad'
+        elif seccion =='6':
+            print('Has elegido la seccion: Educacion')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/educacion'
+        elif seccion =='7':
+            print('Has elegido la seccion: Medio Ambiente')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/clima-y-medio-ambiente'
+        elif seccion =='8':
+            print('Has elegido la seccion: Ciencia')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/ciencia'
+        elif seccion =='9':
+            print('Has elegido la seccion: Salud')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/salud-y-bienestar'
+        elif seccion =='10':
+            print('Has elegido la seccion: Tecnologia')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/tecnologia'
+        elif seccion =='11':
+            print('Has elegido la seccion: Cultura')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/cultura'
+        elif seccion =='12':
+            print('Has elegido la seccion: Television')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/television'
+        elif seccion =='13':
+            print('Has elegido la seccion: Gente')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/gente'
+        elif seccion =='14':
+            print('Has elegido la seccion: Internacional')
+            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/internacional'
+        
+        return url
+
+
+
 
 washingtonPost=WashingtonPost()
 elMundo=ElMundo()

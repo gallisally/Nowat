@@ -1,8 +1,8 @@
 import time
-from extraccion import *
+from extracciones.extraccion_nyt import *
 from scraping import *
-from noticias_nlp import *
-from washington_post.extraccion_wp import WashingtonPost,ElMundo
+from npl.noticias_nlp import *
+from extracciones.extraccion_varias import WashingtonPost,ElMundo
 
 
 def procesar_nyt(url):
@@ -10,7 +10,7 @@ def procesar_nyt(url):
         
     print('Extrayendo los hiperenlaces de las ultimas noticias...')
     print(url)
-    time.sleep(2)
+    #time.sleep(2)
     contenido_interes=get_contenido(url)
     primeros_indices,final_indices,url=parseo_contenido(contenido_interes,url)
     urls_limpias=get_urls(primeros_indices, final_indices,contenido_interes,url)
@@ -42,11 +42,31 @@ def procesar_wp(url):
 
 
 def procesar_elMundo(url):
-    urls=elMundo.extraccion_em(url)
-    print(urls)
+   urls=elMundo.extraccion_em(url)
+   print('Contenido extraido')
+   for i in urls:
+        print(f'La URL del articulo es: {i}\n')
+        texto=coger_noticias(i)
+        print('---------------')
+        det_sentimiento(texto)
+        print('.......')     
+   return url,urls
 
+
+def procesar_elDiario(url):
+    urls=elMundo.extraccion_em(url)
+    print('Contenido extraido')
+    for i in urls:
+            print(f'La URL del articulo es: {i}\n')
+            texto=coger_noticias(i)
+            print('---------------')
+            det_sentimiento(texto)
+            print('.......')     
     return url,urls
 
+    #fechas=scraping_elDiario(urls)
+    #return fechas,urls
+   
 
 washingtonPost=WashingtonPost()
 elMundo=ElMundo()

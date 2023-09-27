@@ -1,5 +1,5 @@
 from mastodon import Mastodon 
-from credenciales import CLIENT_KEY,CLIENT_SECRET,REDIRECT_URI,ACCESS_TOKEN
+from mastodon.credenciales import CLIENT_KEY,CLIENT_SECRET,REDIRECT_URI,ACCESS_TOKEN
 
 
 #creando instancia y atenticacion

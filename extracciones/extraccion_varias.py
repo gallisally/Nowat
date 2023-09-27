@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import ssl
+import feedparser
+from newspaper import Article
 
 
 class WashingtonPost:
@@ -45,22 +48,32 @@ class ElMundo:
         self.url=""
 
     def extraccion_em(self,url):
-        contenido=requests.get(url)
-        if contenido.status_code==200:
-            html=contenido.text
-            soup=BeautifulSoup(html,'html.parser')
-            urls=soup.findall('a')
-            urls=[]
-            for i in urls:
-                href=i.get('href')
-                if href:
-                    urls.append(i)
-            print('-----------')
-            return urls
-        else:
-            print("No se pudo acceder a la página:", contenido.status_code)    
-        return urls
+        noticia=Article(url)
+        noticia.download(url)
+        #para evitar problemas de certificados(sol temportal)
+        ssl._create_default_https_context = ssl._create_unverified_context
+        feed=feedparser.parse(url)
+        #print(feed)
+        #extrayendo enlaces portada em
+        urls=[]
+        if 'entries' in feed:
+            for entry in feed.entries:
+                url=entry.link
+                urls.append(url)
+        """
+        for url in urls:
+            noticia=Article(url)
+            noticia.download(url)
+            texto=noticia.text
+        print(f'El texto de la noticia es: {texto}')
+        
+        #print (urls)
 
+        return urls,texto
+        """
+            
+
+        return urls
 
             
     
