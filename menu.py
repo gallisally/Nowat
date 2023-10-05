@@ -22,10 +22,9 @@ class Menus:
 
     def procesar_todos_los_periodicos(self):
         conn,cursor=conexion_bbdd()
-        # Creamos una instancia de la clase Seccion para acceder a sus métodos
         seccion = Seccion()
 
-        # Definimos un diccionario que contiene información sobre los periódicos y sus secciones
+        # Diccionario que contiene información sobre los periódicos y sus secciones
         periodicos = {
             'New York Times': [
                 ('Portada del dia', 'https://www.nytimes.com/'),
@@ -35,7 +34,7 @@ class Menus:
                 ('Opinion', 'https://www.nytimes.com/section/opinion'),
                 ('Tecnologia', 'https://www.nytimes.com/section/technology')
             ],
-            # Repetimos el mismo patrón para los demás periódicos
+            # Repetir el mismo patrón para los demás periódicos
         }
 
         # Iteramos sobre el diccionario de periódicos
@@ -47,14 +46,11 @@ class Menus:
                 nombre_medio='New York Times'
                 print('Procesando NYT')
                 
-                
-            # Iteramos sobre las secciones y URLs del periódico actual
                 for seccion, url_seccion in secciones:
                     print(f'Procesando seccion: {seccion}')
                     url = url_seccion
-                    #Llamar a la función de procesamiento con la URL de la sección
-                    url,nombre_medio=procesar_nyt(url,conn,cursor,seccion)  # Reemplaza 'procesar_periodico_seccion' con tu función de procesamiento adecuada
-                    #subj_per(subjetividad_periodico)
+                    #Llamando funcion de procesamiento con la URL de la sección
+                    url,nombre_medio=procesar_nyt(url,conn,cursor,seccion)  
                     print(f'{seccion} procesada')
             
                 return nombre_medio

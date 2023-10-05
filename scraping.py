@@ -3,8 +3,6 @@ from newspaper import Article
 from datetime import datetime
 import re
 
-#url='https://www.washingtonpost.com/'
-#para almacenar el script principal
 def coger_noticias(url):
     #pasando a la variable el objeto articulo con la url corr
     noticia=Article(url)
@@ -29,43 +27,16 @@ def coger_noticias(url):
     else:
         fecha_publicacion=None
 
-        
-
-    #fecha_publicacion_str=str(noticia.publish_date)
-    #fecha_publicacion_str=fecha_publicacion_str.split()[0]
-    #fecha_publicacion=datetime.strptime(fecha_publicacion_str, '%Y-%m-%d')
-    #fecha_publicacion=fecha_publicacion.strftime('%Y/%m/%d')
-    #fecha_publicacion_spain=noticia.publish_date
-    #fecha_publicacion_spain=fecha_publicacion_spain.strftime("%m/%d/%Y")
     resumen=noticia.summary
     texto=noticia.text
     keywords_set=noticia.keywords
     keywords_list=list(keywords_set)
     keywords=','.join(keywords_list)
     imagen_principal=noticia.top_image
-    #imagen_principal_set=noticia.top_image
-    #imagen_principal_list = [str(url) for url in imagen_principal_set]
-    #imagen_principal = ', '.join(imagen_principal_list)
-    #imagen_principal_list=list(imagen_principal_set)
-    #imagen_principal=','.join(imagen_principal_list)
     imagenes_2=str(noticia.images)
-    """
-    imagenes_2_set=noticia.images
-    l_imagen_2=[]
-    for i in imagenes_2_set:
-        l_imagen_2.append(i)"""
-        
-    #imagenes_2_list=[str(url) for url in imagenes_2_set]
-    #imagenes_2=','.join(l_imagen_2)
-    #autor_set=noticia.authors
-    #autor=''.join(autor_set)
-    #autor=str(noticia.authors)
-
-
+    
     print(f'Titulo de la noticia: {titulo_noticia}')
     
-
-    #accediendo a la instancia autor dentro de la clase noticia
     print(f'Autor:{autor}')
 
     
@@ -102,5 +73,4 @@ def scraping_elDiario(urls):
     
 
 
-#coger_noticias('https://www.nytimes.com/live/2023/08/30/us/hurricane-idalia-florida')
 

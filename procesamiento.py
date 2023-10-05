@@ -17,8 +17,6 @@ def procesar_nyt(url,conn,cursor,seccion):
     contenido_interes=get_contenido(url)
     primeros_indices,final_indices,url=parseo_contenido(contenido_interes,url)
     urls_limpias=get_urls(primeros_indices, final_indices,contenido_interes,url)
-    #llamando resumen
-    # def llamar_resumen(urls_limpias):
     for i in urls_limpias:
         print('-----------')
         #print(urls_limpias)
@@ -26,28 +24,24 @@ def procesar_nyt(url,conn,cursor,seccion):
         titulo_noticia,fecha_publicacion,autor,resumen,texto,keywords,imagen_principal,imagenes_2=coger_noticias(i)
         print('---------------')
         media_polaridad,media_subjetividad=det_sentimiento(texto)
-       #media_polaridad,media_subjetividad=det_sentimiento(i,titulo_noticia,fecha_publicacion,resumen,texto,keywords,im_principal,imagenes_2)
         insercion_datos(conn,cursor,nombre_medio,tipo_medio,i,seccion,titulo_noticia,fecha_publicacion,autor,resumen,texto,keywords
 ,media_subjetividad,media_polaridad,imagen_principal,imagenes_2)
         print('.......')
 
-    #insercion_datos(conn,cursor)
     print('todo correcto')
-    #return contenido_interes,urls_limpias,url,nombre_medio,tipo_medio
     return url, nombre_medio
-    #return npl
+  
 
         
 def procesar_wp(url):
     urls_wp=washingtonPost.extraccion_wp(url)
     for i in urls_wp:
-        print('-----------')
-        #print(urls_wp)
+        print('---------------------------------------------------')
         print(f'La URL del articulo es: {i}\n')
         resumen=coger_noticias(i)
-        print('---------------')
+        print('---------------------------------------------------')
         det_sentimiento(resumen)
-        print('.......')
+        print('---------------------------------------------------')
     return url,urls_wp
 
 
