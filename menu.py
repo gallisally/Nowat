@@ -2,15 +2,67 @@ import time
 from extracciones.extraccion_nyt import *
 from procesamiento import procesar_nyt,procesar_wp,procesar_elMundo,procesar_elDiario
 from extracciones.extraccion_varias import WashingtonPost,ElMundo
-from npl.noticias_nlp import sp_periodico
-#from extraccion import llamar_extraccion,llamar_resumen
-#from  washington_post.extraccion_wp import WashingtonPost
-#from washington_post import extraccion_wp 
+from bbdd.create_db import *
+
+import sys
+import os
+
 
 class Menus:
     def __init__(self):
         self.nombre=""
 
+    def ocultar(self):
+        self.salida_original = sys.stdout  # Guarda la salida estándar original
+        sys.stdout = open(os.devnull, 'w')  # Redirige la salida a /dev/null
+
+    def mostrar(self):
+        sys.stdout.close()  # Cierra el archivo de salida
+        sys.stdout = self.salida_original 
+
+    def procesar_todos_los_periodicos(self):
+        conn,cursor=conexion_bbdd()
+        # Creamos una instancia de la clase Seccion para acceder a sus métodos
+        seccion = Seccion()
+
+        # Definimos un diccionario que contiene información sobre los periódicos y sus secciones
+        periodicos = {
+            'New York Times': [
+                ('Portada del dia', 'https://www.nytimes.com/'),
+                ('Politica', 'https://www.nytimes.com/section/politics'),
+                ('Salud', 'https://www.nytimes.com/section/health'),
+                ('Negocios', 'https://www.nytimes.com/section/business'),
+                ('Opinion', 'https://www.nytimes.com/section/opinion'),
+                ('Tecnologia', 'https://www.nytimes.com/section/technology')
+            ],
+            # Repetimos el mismo patrón para los demás periódicos
+        }
+
+        # Iteramos sobre el diccionario de periódicos
+        for periodico, secciones in periodicos.items():
+            #subjetividad_periodico = []
+            print(f'Procesando {periodico}')
+            #self.ocultar()
+            if periodico =='New York Times':
+                nombre_medio='New York Times'
+                print('Procesando NYT')
+                
+                
+            # Iteramos sobre las secciones y URLs del periódico actual
+                for seccion, url_seccion in secciones:
+                    print(f'Procesando seccion: {seccion}')
+                    url = url_seccion
+                    #Llamar a la función de procesamiento con la URL de la sección
+                    url,nombre_medio=procesar_nyt(url,conn,cursor,seccion)  # Reemplaza 'procesar_periodico_seccion' con tu función de procesamiento adecuada
+                    #subj_per(subjetividad_periodico)
+                    print(f'{seccion} procesada')
+            
+                return nombre_medio
+
+        print('Procesamiento completado')
+        
+
+    
     def menu_principal(self):
 
         while True:
@@ -31,9 +83,11 @@ class Menus:
             if eleccion =='1':
                 
                 print('Has elegido el New York Times')
-                url=seccion.nyt_menu(self.nombre)
+
+                url,seccion=seccion.nyt_menu(self.nombre)
                 procesado,subjetividad_periodico,polaridad_periodico=procesar_nyt(url)
-                sp_periodico(subjetividad_periodico,polaridad_periodico)
+                #print(f'subjetividad {subjetividad_periodico},Polaridad {polaridad_periodico}')
+                #sp_periodico(subjetividad_periodico,polaridad_periodico)
                 #return url,procesado
             elif eleccion =='2':
                 print('Has elegido el Washington Post')
@@ -47,18 +101,18 @@ class Menus:
                 print('Has elegido el perodico El Mundo')
                 url=seccion.menu_elMundo(self.nombre)
                 procesado=procesar_elMundo(url)
-                return url,procesado
+                
             
             elif eleccion=='4':
                 print('Abriendo El Pais')
                 url=seccion.menu_elPais(self.nombre)
                 procesado=procesar_elMundo(url)
-                return url,procesado
+                
             elif eleccion =='5':
                 print('Abriendo elDiario.es')
                 url=seccion.menu_elDiario(self.nombre)
                 procesado=procesar_elDiario(url)
-                return url,procesado
+                
             else:
                 print('Esta opcion aun no esta configurada')
                 break
@@ -89,28 +143,34 @@ class Seccion:
             if eleccion=='1':
                 print('Procesando portada del NYT')
                 url=self.url="https://www.nytimes.com/"
+                seccion='portada'
                 
                 return url
                 
             elif eleccion=='2':
                 print('Abriendo seccion politica del NYT')
                 url=self.url=('https://www.nytimes.com/section/politics')
+                seccion='politica'
                 
             elif eleccion=='3':
                 print('Abriendo seccion Salud del NYT')
                 url=self.url='https://www.nytimes.com/section/health'
+                seccion='salud'
             elif eleccion=='4':
                 print('Abriendo seccion de Negocios del NYT')
                 url=self.url='https://www.nytimes.com/section/business'
+                seccion='negocios'
             elif eleccion =='5':
                 print('Abriendo seccion Opinion del NYT')
                 url=self.url='https://www.nytimes.com/section/opinion'
+                seccion='opinion'
             elif eleccion=='6':
                 print('Abriendo seccion de Tecnologia del NYT')
                 url=self.url='https://www.nytimes.com/section/technology'
+                seccion='tecnologia'
             else:
                 print('Esta opcion aun no esta programada. Por favor, mete la opcion correcta')   
-            return url
+            return url,seccion
         
     def menu_wp(self,nombre):
 
@@ -290,8 +350,8 @@ class Seccion:
             print('Has elegido la portada')
             url=self.url='https://www.eldiario.es/rss/'
         elif seccion =='2':
-            print('Has elegido la seccion: España')
-            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/espana'
+            print('Has elegido la seccion: Internacional')
+            url=self.url='https://www.eldiario.es/rss/internacional/'
         elif seccion =='3':
             print('Has elegido la seccion: Economia')
             url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/economia'
@@ -311,8 +371,8 @@ class Seccion:
             print('Has elegido la seccion: Ciencia')
             url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/ciencia'
         elif seccion =='9':
-            print('Has elegido la seccion: Salud')
-            url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/salud-y-bienestar'
+            print('Has elegido la seccion: Politica')
+            url=self.url='https://www.eldiario.es/rss/politica/'
         elif seccion =='10':
             print('Has elegido la seccion: Tecnologia')
             url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/tecnologia'
@@ -337,6 +397,6 @@ class Seccion:
 washingtonPost=WashingtonPost()
 elMundo=ElMundo()
 #menus=Menus()
-#seccion =Seccion()
+seccion =Seccion()
 #seccion_wp=Seccion_wp()
 #washingtonPost=WashingtonPost()

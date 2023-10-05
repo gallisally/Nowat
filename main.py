@@ -7,6 +7,8 @@ from scraping import *"""
 from menu import Menus
 from extracciones.extraccion_nyt import get_contenido, parseo_contenido, get_urls
 from scraping import *
+from npl.noticias_nlp import *
+from bbdd.create_db import conexion_bbdd
 import time
 
 
@@ -18,6 +20,11 @@ import time
 
 def inicio():
     menus=Menus()
+    conexion_bbdd()
+    #menus.ocultar()
+    menus.procesar_todos_los_periodicos()
+    #menus.mostrar()
+    print('Procesamiento de periodicos completado')
     url=menus.menu_principal()
     
     #menu_principal()
