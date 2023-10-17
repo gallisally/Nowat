@@ -2,77 +2,50 @@ import time
 from extracciones.extraccion_nyt import *
 from scraping import *
 from npl.noticias_nlp import *
+from extracciones.extraccion_nyt import *
 from extracciones.extraccion_varias import WashingtonPost,ElMundo
 from bbdd.create_db import insercion_datos
+from menu import *
 
 
-def procesar_nyt(url,conn,cursor,seccion):
-
-    #subjetividad_periodico=[]   
-    print('Extrayendo los hiperenlaces de las ultimas noticias...')
-    print(url)
-    nombre_medio='New York Times'
-    tipo_medio='periodico'
-    #time.sleep(2)
-    contenido_interes=get_contenido(url)
-    primeros_indices,final_indices,url=parseo_contenido(contenido_interes,url)
-    urls_limpias=get_urls(primeros_indices, final_indices,contenido_interes,url)
-    for i in urls_limpias:
-        print('-----------')
+def procesar_guardar_periodico(secciones,conn,cursor,nombre_medio,tipo_medio):
+    for seccion, url_seccion in secciones:
+                    print(f'Procesando seccion: {seccion}')
+                    url = url_seccion
+                    print(f'La url de la seccion es : {url}') 
+                    urls=funcion_extraccion(nombre_medio,url) 
+                    scraping_sentimientos(urls,conn,cursor,nombre_medio,tipo_medio,seccion)
+                
+def scraping_sentimientos(urls,conn,cursor,nombre_medio,tipo_medio,seccion):     
+      for url in urls:
         #print(urls_limpias)
-        print(f'La URL del articulo es: {i}\n')
-        titulo_noticia,fecha_publicacion,autor,resumen,texto,keywords,imagen_principal,imagenes_2=coger_noticias(i)
-        print('---------------')
-        media_polaridad,media_subjetividad=det_sentimiento(texto)
-        insercion_datos(conn,cursor,nombre_medio,tipo_medio,i,seccion,titulo_noticia,fecha_publicacion,autor,resumen,texto,keywords
-,media_subjetividad,media_polaridad,imagen_principal,imagenes_2)
-        print('.......')
-
-    print('todo correcto')
-    return url, nombre_medio
-  
-
+        print(f'La URL del articulo es: {url}\n')  
         
-def procesar_wp(url):
-    urls_wp=washingtonPost.extraccion_wp(url)
-    for i in urls_wp:
+        titulo_noticia,autor,fecha_publicacion,resumen,texto,keywords,imagen_principal,imagenes_2=coger_noticias(url)
+        """if titulo_noticia=='' and fecha_publicacion==None and resumen=='' and texto=='':
+              pass
+        else:
+        """
+        print('se han cogido las noticias')
         print('---------------------------------------------------')
-        print(f'La URL del articulo es: {i}\n')
-        resumen=coger_noticias(i)
-        print('---------------------------------------------------')
-        det_sentimiento(resumen)
-        print('---------------------------------------------------')
-    return url,urls_wp
+        if texto=='': 
+          media_polaridad=None
+          media_subjetividad=None
+        else:        
+          media_polaridad,media_subjetividad=det_sentimiento(texto)
+          return media_subjetividad,media_polaridad
+        #print(url)
 
+        insercion_datos(conn,cursor,nombre_medio,tipo_medio,url,seccion,titulo_noticia,autor,fecha_publicacion,resumen,texto,keywords
+                ,media_subjetividad,media_polaridad,imagen_principal,imagenes_2)
+        #print(f'{seccion} procesada')
+        print(f'la urlmetida es {url}')
+        print(f'el titulo a mater es: {titulo_noticia}')
+        print(f'autor metido es_{autor}')
+        print(f'fecha metida :{fecha_publicacion}')
+      #return titulo_noticia,autor,fecha_publicacion,resumen,texto,keywords,media_polaridad,media_subjetividad,imagen_principal,imagenes_2
+      
 
-def procesar_elMundo(url):
-   urls=elMundo.extraccion_em(url)
-   print('Contenido extraido')
-   for i in urls:
-        print(f'La URL del articulo es: {i}\n')
-        texto=coger_noticias(i)
-        print('---------------')
-        det_sentimiento(texto)
-        print('.......')     
-   return url,urls
-
-
-def procesar_elDiario(url):
-    urls=elMundo.extraccion_em(url)
-    print('Contenido extraido')
-    scraping_elDiario(urls)
-    print('fin scraping')
-    """for i in urls:
-            print(f'La URL del articulo es: {i}\n')
-            texto=coger_noticias(i)
-            print('---------------')
-            det_sentimiento(texto)
-            print('.......')    """ 
-    return url,urls
-
-    #fechas=scraping_elDiario(urls)
-    #return fechas,urls
-   
 
 washingtonPost=WashingtonPost()
 elMundo=ElMundo()

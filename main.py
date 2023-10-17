@@ -37,14 +37,5 @@ def inicio():
 menus=Menus()
 
 url=inicio()
-"""
-url=inicio()
-urls_limpias,contenido_interes,url =llamar_extraccion(url)
-i,resumen=llamar_resumen(urls_limpias)
-"""
 
-#INSTANCIAS
-
-
-#seccion=Seccion()
 

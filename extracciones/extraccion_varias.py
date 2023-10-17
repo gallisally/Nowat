@@ -1,10 +1,32 @@
 import requests
 from bs4 import BeautifulSoup
+from extracciones.extraccion_nyt import *
+from extracciones.extraccion_varias import *
 import time
 import ssl
 import feedparser
 from newspaper import Article
+from urllib.request import urlopen
 
+
+def funcion_extraccion(nombre_medio, url):
+    extracciones = {
+        'New York Times': lambda: extraer_nyt(url),
+        'El Mundo': lambda: elMundo.extraccion_em(url),
+        'El Pais': lambda: elMundo.extraccion_em(url),
+        'elDiario.es':lambda:elMundo.extraccion_em(url),
+        '404':lambda:elMundo.extraccion_em(url),
+        'Al-Masdar':lambda:elMundo.extraccion_em(url),
+        'El Confidencial':lambda:elMundo.extraccion_em(url),
+        'La Razon': lambda:extraccion_html(url),
+        'ABC':lambda: extraccion_abc(url),
+        'La Vanguardia':lambda:extraccion_abc(url),
+        '20minutos':lambda:elMundo.extraccion_em(url),
+        'cnn':lambda:extraccion_abc(url)
+    }
+    urls = extracciones.get(nombre_medio)()
+    print (f'se ha extraido')
+    return urls
 
 class WashingtonPost:
     def __init__(self):
@@ -50,32 +72,60 @@ class ElMundo:
     def extraccion_em(self,url):
         noticia=Article(url)
         noticia.download(url)
-        #para evitar problemas de certificados(sol temportal)
+        #para evitar problemas de certificados(solucion temportal)
         ssl._create_default_https_context = ssl._create_unverified_context
         feed=feedparser.parse(url)
-        #print(feed)
-        #extrayendo enlaces portada em
         urls=[]
         if 'entries' in feed:
             for entry in feed.entries:
                 url=entry.link
                 urls.append(url)
-        """
-        for url in urls:
-            noticia=Article(url)
-            noticia.download(url)
-            texto=noticia.text
-        print(f'El texto de la noticia es: {texto}')
-        
-        #print (urls)
 
-        return urls,texto
-        """
-            
-
+        for item in feed.entries:
+            link=item.link
+            urls.append(link)
+        print (f'las urls son :{urls}')
         return urls
 
-            
+
+def extraccion_html(url):
+    #realizando solicitud http para coger contenido de la url
+    response=requests.get(url)
+    html=response.text
+    #creando objeto soup procesando html
+    soup=BeautifulSoup(html,'html.parser')
+    #buscando links de las noticias con etiqueta a
+    enlaces=soup.find_all('a',href=True)
+    urls=[]
+    patron=r".*.html$"
+    for a in enlaces:
+        url=a['href']
+        if re.match(patron,url):
+            urls.append(url)
+        else:
+            pass
+    print(urls)
+    #print(f'Las urls extraidas de la razon son las siguientes:{urls}')
+    return urls
+
+def extraccion_abc(url):
+    ssl._create_default_https_context = ssl._create_unverified_context
+
+    response = urlopen(url)
+    rss = response.read()
+    soup=BeautifulSoup(rss,'xml')
+    items=soup.find_all('item')
+    urls=[]
+    for item in items:
+        link=item.find('link').text
+        #titulo=item.find('title').text
+        urls.append(link)
+    print(f'las urls son_ {urls}')
+    return urls
+
+
+
+    
     
 washingtonPost=WashingtonPost()
 elMundo=ElMundo()

@@ -1,25 +1,26 @@
 from textblob import TextBlob
 import time
+from extracciones.extraccion_varias import *
 
 def det_sentimiento(historia):
     historia_blob = TextBlob(historia)
     polaridad = []
     subjetividad = []
+    if not historia:
+        media_subjetividad=None
+        media_polaridad=None
+        print('El texto es nulo')
+    else:
 
-    for frase in historia_blob.sentences:
-        sentimiento = frase.sentiment
-        polaridad.append(sentimiento.polarity)
-        subjetividad.append(sentimiento.subjectivity)
 
-    # Calculo de las medias de las listas de polaridad y subjetividad
-    media_polaridad = medias_ps(polaridad)
-    media_subjetividad = medias_ps(subjetividad)
+        for frase in historia_blob.sentences:
+            sentimiento = frase.sentiment
+            polaridad.append(sentimiento.polarity)
+            subjetividad.append(sentimiento.subjectivity)
 
-    #media_subj_periodico=medias_ps(subjetividad_periodico)
-    #polaridad_periodico.append(media_polaridad)
-    #subjetividad_periodico.append(media_subj)
-    
-
+        # Calculo de las medias de las listas de polaridad y subjetividad
+        media_polaridad = medias_ps(polaridad)
+        media_subjetividad = medias_ps(subjetividad)
 
     print('TEST FINAL')
     print(f'Nivel de subjetividad (de 0 a 1): {sentimiento_general(media_subjetividad, "subjetividad")} ({media_subjetividad})')
@@ -27,16 +28,12 @@ def det_sentimiento(historia):
     return media_polaridad,media_subjetividad
 
 def medias_ps(lista):
-    resultado = sum(lista) / len(lista)
+    if len(lista)>0:
+        resultado = sum(lista) / len(lista)
+    else:
+        resultado=None
     return resultado
-"""
-def subj_per(subjetividad_periodico,media_subj_periodico):
-    print(f'subjetividad:{subjetividad_periodico}')
-    #r=sum(subjetividad_periodico)/len(subjetividad_periodico)
-    r=media_subj_periodico()
-    print(f'La subjetividad media es {r}')
-    return r
-"""
+
 def sentimiento_general(sentimiento, tipo):
     categoria = ""
     if tipo == 'subjetividad':
@@ -58,6 +55,8 @@ def sentimiento_general(sentimiento, tipo):
             categoria = 'Altamente objetivo'
         elif sentimiento == 0:
             categoria = 'Totalmente objetivo'
+        elif sentimiento == 'null':
+            categoria='Nulo'
         else:
             print('Input invalido')
         return categoria

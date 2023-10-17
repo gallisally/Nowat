@@ -3,6 +3,21 @@ import requests
 from menu import *
 from bs4 import BeautifulSoup as soup
 import re
+from menu import *
+import ssl
+
+def extraer_nyt(url):
+    ssl._create_default_https_context = ssl._create_unverified_context
+
+    print('Extrayendo los hiperenlaces de las ultimas noticias...')
+    print(url)
+    nombre_medio='New York Times'
+    tipo_medio='periodico'
+    #time.sleep(2)
+    contenido_interes=get_contenido(url)
+    primeros_indices,final_indices,url=parseo_contenido(contenido_interes,url)
+    urls=get_urls(primeros_indices, final_indices,contenido_interes,url)
+    return urls
 
 #para coger el string del contenido en HTML conteninedo todos los hiperliks del articulo
 def get_contenido(url):
@@ -16,7 +31,6 @@ def get_contenido(url):
     paquete_url=pagina_soup.find_all("script", {"type" : "application/ld+json"})
     
     #inicializando lista que contendra los tags
-#mes.com/2023/09/19/technology/instacart-ipo-stock-shares.html
     #EXTRAYENDO TODOS HYPERLINKS
     etiquetas=[]
     for paquete in paquete_url:

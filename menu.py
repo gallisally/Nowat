@@ -1,6 +1,6 @@
 import time
 from extracciones.extraccion_nyt import *
-from procesamiento import procesar_nyt,procesar_wp,procesar_elMundo,procesar_elDiario
+from procesamiento import extraer_nyt,scraping_sentimientos,procesar_guardar_periodico
 from extracciones.extraccion_varias import WashingtonPost,ElMundo
 from bbdd.create_db import *
 
@@ -23,9 +23,111 @@ class Menus:
     def procesar_todos_los_periodicos(self):
         conn,cursor=conexion_bbdd()
         seccion = Seccion()
-
+        
         # Diccionario que contiene información sobre los periódicos y sus secciones
         periodicos = {
+         
+            'La Vanguardia':[
+                ('Portada','https://www.lavanguardia.com/rss/home.xml'),
+                ('Internacional','https://www.lavanguardia.com/rss/internacional.xml'),
+                ('Politica','https://www.lavanguardia.com/rss/politica.xml'),
+                ('Vida','https://www.lavanguardia.com/rss/vida.xml'),
+                ('Deportes','https://www.lavanguardia.com/rss/deportes.xml'),
+                ('Economia','https://www.lavanguardia.com/rss/economia.xml'),
+                ('Opinion','https://www.lavanguardia.com/rss/opinion.xml'),
+                ('Cultura','https://www.lavanguardia.com/rss/cultura.xml'),
+                ('Gente','https://www.lavanguardia.com/rss/gente.xml'),
+                ('Sucesos','https://www.lavanguardia.com/rss/sucesos.xml'),
+                ('Participacion','https://www.lavanguardia.com/rss/participacion.xml')
+
+            ],
+
+            'abc':[
+                
+                ('Portada','https://www.abc.es/rss/atom/portada/'),
+                #('Portada','https://www.abc.es/rss/2.0/portada/'),
+                ('Ultima hora','https://www.abc.es/rss/2.0/ultima-hora/'),
+                ('Opinion','https://www.abc.es/rss/2.0/opinion/'),
+                ('España','https://www.abc.es/rss/2.0/espana/'),
+                ('Economia','https://www.abc.es/rss/2.0/economia/'),
+                ('Internacional','https://www.abc.es/rss/2.0/internacional/'),
+                ('Deportes','https://www.abc.es/rss/2.0/deportes/'),
+                ('Sociedad','https://www.abc.es/rss/2.0/sociedad/'),
+                ('Cultura','https://www.abc.es/rss/2.0/cultura/'),
+                ('Gente','https://www.abc.es/rss/2.0/gente/'),
+                ('Esitlo','https://www.abc.es/rss/2.0/estilo/'),
+                ('Play','https://www.abc.es/rss/2.0/play/')
+
+            ],
+
+            'La Razon':[
+                ('Portada','https://www.larazon.es/'),
+                ('España','https://www.larazon.es/espana/'),
+                ('Internacional','https://www.larazon.es/internacional/'),
+                ('Economia','https://www.larazon.es/economia/'),
+                ('Sociedad','https://www.larazon.es/sociedad/'),
+                ('Opinion','https://www.larazon.es/opinion/'),
+                ('Salud','https://www.larazon.es/salud/'),
+                ('Deportes','https://www.larazon.es/deportes/'),
+                ('Cultura','https://www.larazon.es/cultura/'),
+                ('Gente','https://www.larazon.es/gente/'),
+                ('25 aniversario','https://www.larazon.es/25-aniversario/'),
+                ('Motor','https://www.larazon.es/motor/')
+            ],
+            'elDiario.es':[
+                
+                ('Portada-rss','https://www.eldiario.es/rss/'),
+                ('Internacional','https://www.eldiario.es/rss/internacional/'),
+                ('Economia','https://www.eldiario.es/rss/economia/'),
+                ('Cultura','https://www.eldiario.es/rss/opinion/'),
+                ('Educacion','https://www.eldiario.es/rss/focos/educacion/'),
+                ('Clima y Medio Ambiente','https://www.eldiario.es/rss/focos/crisis-climatica/'),
+                ('Desalambre','https://www.eldiario.es/rss/desalambre/'),
+                ('Igualdad','https://www.eldiario.es/rss/focos/igualdad/'),
+                ('Politica','https://www.eldiario.es/rss/politica/')
+            ],
+            
+            'El Confidencial':[
+               
+                #('Opinion','https://rss.blogs.elconfidencial.com/'),
+                ('Portada RSS','https://www.elconfidencial.com/rss/'),
+                ('Portada','https://www.elconfidencial.com/'),
+                ('España','https://www.elconfidencial.com/espana/'),
+                ('Economia','https://www.elconfidencial.com/mercados/'),
+                ('Opinion','https://blogs.elconfidencial.com/'),
+                ('Salud','https://www.alimente.elconfidencial.com/'),
+                ('Internacional','https://www.elconfidencial.com/mundo/'),
+                ('Cultura','https://www.elconfidencial.com/cultura/'),
+                ('Tecnologia','https://www.elconfidencial.com/tecnologia/'),
+                ('Deportes','https://www.elconfidencial.com/deportes/'),
+                ('Alma,Corazon y Vida','https://www.elconfidencial.com/alma-corazon-vida/'),
+                ('Television','https://www.elconfidencial.com/television/'),
+                
+                ('Actualidad (mundo)','https://rss.elconfidencial.com/mundo/'),
+                ('Actualidad(España)','https://rss.elconfidencial.com/espana/'),
+                ('Actualidad(Comunicacion)','https://rss.elconfidencial.com/comunicacion/'),
+                ('Actualidad(Sociedad)','https://rss.elconfidencial.com/sociedad/'),
+                ('Opinion','https://rss.blogs.elconfidencial.com/'),
+                ('Economia','https://rss.elconfidencial.com/mercados/'),
+                ('Tecnologia','https://rss.elconfidencial.com/tecnologia/'),
+                ('Deportes','https://rss.elconfidencial.com/deportes/'),
+                ('Alma,corazon y vida','https://rss.elconfidencial.com/alma-corazon-vida/'),
+                ('Cultura','https://rss.elconfidencial.com/cultura/'),
+                ('Alimente','https://rss.alimente.elconfidencial.com/')
+
+
+            ],
+            'Al-Masdar':[
+                ('Portada','https://al-masdaronline.net/'),
+                ('Nacional','https://al-masdaronline.net/section/national'),
+                ('local','https://al-masdaronline.net/section/local'),
+                ('Derechos humanos','https://al-masdaronline.net/section/humanrights')
+            ],
+             '404':[
+                ('Portada','https://cuatrocerocuatro.org/feed/')
+            ],
+            
+           
             'New York Times': [
                 ('Portada del dia', 'https://www.nytimes.com/'),
                 ('Politica', 'https://www.nytimes.com/section/politics'),
@@ -33,27 +135,94 @@ class Menus:
                 ('Negocios', 'https://www.nytimes.com/section/business'),
                 ('Opinion', 'https://www.nytimes.com/section/opinion'),
                 ('Tecnologia', 'https://www.nytimes.com/section/technology')
+           ],
+    
+               
+             'El Mundo': [
+                ('Portada','https://e00-elmundo.uecdn.es/rss/portada.xml'),
+                ('Opinion','https://e00-elmundo.uecdn.es/rss/opinion.xml'),
+                ('Economia','https://e00-elmundo.uecdn.es/rss/economia.xml'),
+                ('Deportes','https://e00-elmundo.uecdn.es/rss/deportes.xml'),
+                ('Ciencia y Salud','https://e00-elmundo.uecdn.es/rss/ciencia-y-salud.xml'),
+                ('Internacional','https://e00-elmundo.uecdn.es/rss/internacional.xml'),
+                ('España','https://e00-elmundo.uecdn.es/rss/espana.xml')
             ],
-            # Repetir el mismo patrón para los demás periódicos
+            
+            'El Pais':[
+                ('Portada','https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada'),
+                ('España','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/espana'),
+                ('Economia','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/economia'),
+                ('Deportes','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/deportes'),
+                ('Sociedad','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/sociedad'),
+                ('Educacion','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/educacion'),
+                ('Medio Ambiente','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/clima-y-medio-ambiente'),
+                ('Ciencia','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/ciencia'),
+                ('Salud','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/salud-y-bienestar'),
+                ('Tecnologia','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/tecnologia'),
+                ('Cultura','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/cultura'),
+                ('Television','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/television'),
+                ('Gente','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/gente'),
+                ('Internacional','https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/internacional')
+            ] 
+    
         }
+             
+            # Repetir el mismo patrón para los demás periódicos
+        
 
         # Iteramos sobre el diccionario de periódicos
         for periodico, secciones in periodicos.items():
             #subjetividad_periodico = []
             print(f'Procesando {periodico}')
             #self.ocultar()
-            if periodico =='New York Times':
-                nombre_medio='New York Times'
-                print('Procesando NYT')
-                
-                for seccion, url_seccion in secciones:
-                    print(f'Procesando seccion: {seccion}')
-                    url = url_seccion
-                    #Llamando funcion de procesamiento con la URL de la sección
-                    url,nombre_medio=procesar_nyt(url,conn,cursor,seccion)  
-                    print(f'{seccion} procesada')
             
-                return nombre_medio
+            if periodico =='New York Times':
+                print('Procesando NYT')  
+                nombre_medio='New York Times'
+                tipo_medio='periodico'          
+                #procesar_guardar_periodico(secciones,conn,cursor,nombre_medio,tipo_medio)       
+            elif periodico=='El Mundo':
+                #elMundo=ElMundo()
+                print('Procesando el Mundo')
+                nombre_medio='El Mundo'
+                tipo_medio='periodico'
+            elif periodico=='El Pais':
+                nombre_medio='El Pais'
+                tipo_medio='periodico'
+            elif periodico=='elDiario.es':
+                nombre_medio='elDiario.es'
+                tipo_medio='periodico'
+            elif periodico =='404':
+                nombre_medio='404'
+                tipo_medio='periodico'
+            elif periodico=='Al-Masdar':
+                nombre_medio='Al-Masdar'
+                tipo_medio='periodico'
+            elif periodico=='El Confidencial':
+                nombre_medio='El Confidencial'
+                tipo_medio='periodico'
+            elif periodico=='La Razon':
+                nombre_medio= 'La Razon'
+                tipo_medio='periodico'
+            elif periodico=='abc':
+                nombre_medio='ABC'
+                tipo_medio='periodico'
+            elif periodico=='La Vanguardia':
+                nombre_medio='La Vanguardia'
+                tipo_medio='periodico'
+            elif periodico=='20minutos':
+                nombre_medio='20minutos'
+                tipo_medio='periodico'
+            elif periodico =='cnn':
+                nombre_medio='cnn'
+                tipo_medio='periodico'
+            
+
+            
+            procesar_guardar_periodico(secciones,conn,cursor,nombre_medio,tipo_medio) 
+
+
+          
 
         print('Procesamiento completado')
         
@@ -77,14 +246,11 @@ class Menus:
             eleccion=input(menu_1)
             seccion =Seccion()
             if eleccion =='1':
-                
                 print('Has elegido el New York Times')
-
                 url,seccion=seccion.nyt_menu(self.nombre)
-                procesado,subjetividad_periodico,polaridad_periodico=procesar_nyt(url)
-                #print(f'subjetividad {subjetividad_periodico},Polaridad {polaridad_periodico}')
-                #sp_periodico(subjetividad_periodico,polaridad_periodico)
-                #return url,procesado
+                urls=extraer_nyt(url)
+                url=scraping_sentimientos(urls)
+                
             elif eleccion =='2':
                 print('Has elegido el Washington Post')
                 url=seccion.menu_wp(self.nombre)
@@ -96,7 +262,7 @@ class Menus:
             elif eleccion=='3':
                 print('Has elegido el perodico El Mundo')
                 url=seccion.menu_elMundo(self.nombre)
-                procesado=procesar_elMundo(url)
+                procesar_elMundo(url)
                 
             
             elif eleccion=='4':
@@ -140,8 +306,7 @@ class Seccion:
                 print('Procesando portada del NYT')
                 url=self.url="https://www.nytimes.com/"
                 seccion='portada'
-                
-                return url
+                 
                 
             elif eleccion=='2':
                 print('Abriendo seccion politica del NYT')
@@ -335,7 +500,7 @@ class Seccion:
         3-Economia
         4-Cultura
         5-Educacion
-        6-Clima
+        6-Clima y Medio Ambiente
         7-Desalambre
         8-Igualdad
         9-Politica"""
@@ -361,7 +526,7 @@ class Seccion:
             print('Has elegido la seccion: Educacion')
             url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/educacion'
         elif seccion =='7':
-            print('Has elegido la seccion: Medio Ambiente')
+            print('Has elegido la seccion: Clima y Medio Ambiente')
             url=self.url='https://feeds.elpais.com/mrss-s/list/ep/site/elpais.com/section/clima-y-medio-ambiente'
         elif seccion =='8':
             print('Has elegido la seccion: Ciencia')
